@@ -44,14 +44,4 @@ async def upload(file: UploadFile, fs: AsyncIOMotorGridFSBucket, channel):
 
         return file_id
     except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "Internal server error",
-                "data": None,
-                "error": str(e)
-            }
-        )
-
-
-
+        return None, str(e)

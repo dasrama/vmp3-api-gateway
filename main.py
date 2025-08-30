@@ -10,7 +10,6 @@ from config.queue import upload
 
 app = FastAPI()
 
-
 video_client = AsyncIOMotorClient(Settings().MONGO_URI)
 video_db = video_client["video"]
 fs_video = AsyncIOMotorGridFSBucket(video_db)
@@ -19,14 +18,24 @@ mp3_client = AsyncIOMotorClient(Settings().MONGO_URI)
 mp3_db = video_client["mp3"]
 fs_mp3 = AsyncIOMotorGridFSBucket(mp3_db)
 
-connection = pika.BlockingConnection(pika.ConnectionParameters("rabbitmq"))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost", port=5672))
 channel = connection.channel()
 
 
 @app.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     try: 
-        file_id = upload(file, fs_video, channel=channel)
+        file_id, error = upload(file, fs_video, channel=channel)
+
+        if error:
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "message": "Error while uploading file",
+                    "data": None,
+                    "error": str(e)
+                }
+            )
 
         return JSONResponse(
             status_code=200,
