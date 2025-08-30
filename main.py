@@ -1,9 +1,12 @@
+import pika
+from bson import ObjectId
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse, StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
-from bson import ObjectId
 
 from config.settings import Settings
+from config.queue import upload
+
 
 app = FastAPI()
 
@@ -16,16 +19,14 @@ mp3_client = AsyncIOMotorClient(Settings().MONGO_URI)
 mp3_db = video_client["mp3"]
 fs_mp3 = AsyncIOMotorGridFSBucket(mp3_db)
 
+connection = pika.BlockingConnection(pika.ConnectionParameters("rabbitmq"))
+channel = connection.channel()
 
-@app.post("upload")
+
+@app.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     try: 
-        contents = await file.read()
-
-        file_id = await fs_video.upload_from_stream(
-            file.filename,
-            contents
-        )
+        file_id = upload(file, fs_video, channel=channel)
 
         return JSONResponse(
             status_code=200,
