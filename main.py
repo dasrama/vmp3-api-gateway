@@ -18,7 +18,8 @@ mp3_client = AsyncIOMotorClient(Settings().MONGO_URI)
 mp3_db = video_client["mp3"]
 fs_mp3 = AsyncIOMotorGridFSBucket(mp3_db)
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost", port=5672))
+params = pika.URLParameters(Settings().RABBITMQ_URI)
+connection = pika.BlockingConnection(parameters=params)
 channel = connection.channel()
 
 
