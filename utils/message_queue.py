@@ -2,10 +2,10 @@ import pika
 import json
 
 
-from config.settings import Settings
+connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost')
+    )
 
-params = pika.URLParameters(Settings().RABBITMQ_URI)
-connection = pika.BlockingConnection(parameters=params)
 channel = connection.channel()
 
 
