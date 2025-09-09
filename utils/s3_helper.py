@@ -18,9 +18,9 @@ async def upload_to_s3(file: UploadFile, object_name=None):
     content = await file.read()
 
     s3_client.put_object(
-        bucket=Settings().BUCKET_NAME,
-        key=object_name,
-        body=content
+        Bucket=Settings().BUCKET_NAME,
+        Key=object_name,
+        Body=content
     )
 
     return object_name

@@ -2,12 +2,8 @@ import pika
 import json
 
 
-connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost')
-    )
-
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
-
 
 def publish_to_rabbitmq(file_id: str):
     try:

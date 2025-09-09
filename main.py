@@ -36,9 +36,9 @@ async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = Fil
 
 
 @app.get("/download")
-def download_video(filename: str):
+async def download_video(filename: str):
     try:
-        return download_from_s3(Settings().BUCKET_NAME, filename)
+        return await download_from_s3(Settings().BUCKET_NAME, filename)
     except Exception as e:
         return JSONResponse(
             status_code=500,
