@@ -1,3 +1,4 @@
+from uuid import uuid4
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks
 from fastapi.responses import JSONResponse
 
@@ -13,9 +14,9 @@ async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = Fil
     try:
         # open upload stream (GridFS writer)
         print("file goes to upload")
-        
 
         file_name = await upload_to_s3(file)
+        job_id = str(uuid4())
 
         background_tasks.add_task(publish_to_rabbitmq, file_name)
 
@@ -35,7 +36,7 @@ async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = Fil
         )
 
 
-@app.get("/download")
+@app.get("/download-video")
 async def download_video(filename: str):
     try:
         return await download_from_s3(Settings().BUCKET_NAME, filename)
